@@ -126,6 +126,14 @@
 
   .filter-row{ display:flex; gap:8px; align-items:center; margin-bottom:6px; }
   .filter-row input[type=text]{ flex:1; }
+  .catalog-header-lbl{ font-family:var(--serif); font-weight:600; font-size:15px; }
+  .catalog-header-lbl .count{ font-family:var(--sans); font-weight:400; font-size:12px; color:var(--slate); }
+  .time-filter-row{ flex-wrap:wrap; row-gap:6px; }
+  .time-filter-row select{ flex:1 1 100px; min-width:90px; width:auto; }
+  .time-filter-row input[type=time]{ flex:1 1 110px; min-width:100px; }
+  .time-filter-row .time-filter-sep{ color:var(--slate); font-family:var(--mono); font-size:12px; flex:0 0 auto; }
+  .time-filter-row button{ flex:0 0 auto; }
+  .time-filter-hint{ margin:-2px 0 6px !important; }
   .toggle-row{ display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--slate); margin:8px 0; }
 
   .select-list{ display:flex; flex-direction:column; gap:6px; margin-top:6px; max-height:640px; overflow-y:auto; }
@@ -143,6 +151,44 @@
   .status.ok{ color:var(--green); }
   .status.locked{ color:var(--amber); }
   .status.done{ color:var(--slate); }
+
+  .timing-list{ margin-top:6px; display:flex; flex-direction:column; gap:6px; }
+  .timing-block{
+    display:block; width:100%; text-align:left; font-family:var(--mono); font-size:11px;
+    background:var(--paper); color:var(--ink); border:1px solid var(--rule); border-radius:2px;
+    padding:6px 9px; cursor:pointer; transition:background .12s, border-color .12s, color .12s;
+  }
+  .timing-block:hover{ border-color:var(--ink); }
+  .timing-block.selected{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .timing-block.best-gap{ border-color:var(--green); }
+  .timing-block.selected.best-gap{ border-color:var(--ink); }
+  .timing-block-head{ display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:3px; flex-wrap:wrap; }
+  .timing-block-head .lbl{ font-weight:600; }
+  .timing-block-head-right{ display:flex; align-items:center; gap:5px; flex-shrink:0; }
+  .timing-block-line{ opacity:.9; padding:1px 0; }
+  .timing-note{ font-size:11px; color:var(--slate); margin-top:2px; font-style:italic; }
+  .best-tag{
+    font-family:var(--sans); font-size:9.5px; font-weight:600; color:var(--green);
+    background:var(--green-bg); border:1px solid var(--green); border-radius:8px;
+    padding:1px 6px; margin-left:5px; white-space:nowrap;
+  }
+  .timing-block.selected .best-tag{ background:var(--paper); }
+  .gap-chip{
+    font-family:var(--mono); font-size:10px; color:var(--slate); background:var(--paper-alt);
+    border:1px solid var(--rule); border-radius:8px; padding:1px 6px; white-space:nowrap;
+  }
+  .gap-chip.best{ color:var(--green); border-color:var(--green); background:var(--green-bg); }
+  .timing-block.selected .gap-chip{ background:transparent; color:var(--paper); border-color:var(--paper); }
+
+  .preview-box{ margin-top:20px; padding-top:14px; border-top:1px solid var(--rule); }
+  .preview-box-title{ font-family:var(--serif); font-weight:600; font-size:15px; }
+  .preview-day{ display:flex; align-items:flex-start; gap:10px; padding:6px 0; border-top:1px solid var(--rule); flex-wrap:wrap; }
+  .preview-day:first-child{ border-top:none; }
+  .preview-day-lbl{ font-family:var(--mono); font-size:11.5px; color:var(--slate); width:32px; flex-shrink:0; padding-top:3px; }
+  .preview-chips{ display:flex; align-items:center; flex-wrap:wrap; gap:6px; flex:1; }
+  .preview-chip{ font-family:var(--mono); font-size:11.5px; background:var(--paper); border:1px solid var(--rule); border-radius:2px; padding:3px 8px; }
+  .preview-gap{ font-family:var(--mono); font-size:10px; color:var(--slate); }
+  .preview-gap.clash{ color:var(--red); font-weight:600; }
 
   .generate-bar{ display:flex; align-items:center; gap:12px; margin-top:16px; flex-wrap:wrap; }
   .generate-bar .count{ font-size:13px; color:var(--slate); }
@@ -163,34 +209,35 @@
   .summary-strip b{ color:var(--ink); font-size:16px; display:block; font-family:var(--serif); font-weight:600; }
 
   .calendar-wrap{ overflow-x:auto; border:1px solid var(--rule); background:var(--paper); }
-  .calendar{ display:flex; min-width:760px; }
-  .time-axis{ position:relative; width:56px; flex-shrink:0; border-right:1px solid var(--rule); }
-  .time-axis .lbl{
-    position:absolute; right:8px; transform:translateY(-50%); font-family:var(--mono);
-    font-size:11px; color:var(--slate);
+  .calendar{ display:flex; flex-direction:column; }
+  .day-axis-spacer{ width:64px; flex-shrink:0; border-right:1px solid var(--rule); }
+  .time-header-row{ display:flex; }
+  .time-header{ position:relative; flex:1; min-width:900px; height:32px; border-bottom:1px solid var(--rule); background:var(--paper-alt); }
+  .time-header .lbl{
+    position:absolute; top:50%; transform:translate(-50%,-50%); font-family:var(--mono);
+    font-size:11px; color:var(--slate); white-space:nowrap;
   }
-  .day-col{ position:relative; flex:1; min-width:120px; border-right:1px solid var(--rule); }
-  .day-col:last-child{ border-right:none; }
-  .day-col .hline{ position:absolute; left:0; right:0; border-top:1px solid var(--rule); }
-  .day-header{
+  .day-row{ display:flex; }
+  .day-track{ position:relative; flex:1; min-width:900px; height:66px; border-bottom:1px solid var(--rule); }
+  .day-track .vline{ position:absolute; top:0; bottom:0; border-left:1px solid var(--rule); }
+  .day-label{
+    width:64px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
     text-align:center; font-family:var(--mono); font-size:11.5px; letter-spacing:.03em;
-    color:var(--slate); padding:8px 4px; border-bottom:1px solid var(--rule); background:var(--paper-alt);
+    color:var(--slate); border-right:1px solid var(--rule); border-bottom:1px solid var(--rule);
+    background:var(--paper-alt);
   }
-  .day-header-row{ display:flex; }
-  .day-header-row .time-axis-spacer{ width:56px; flex-shrink:0; border-right:1px solid var(--rule); }
-  .day-header-row .day-header{ flex:1; min-width:120px; border-right:1px solid var(--rule); }
-  .day-header-row .day-header:last-child{ border-right:none; }
 
   .block{
-    position:absolute; left:3px; right:3px; border-radius:2px; padding:5px 7px;
+    position:absolute; top:4px; bottom:4px; border-radius:2px; padding:4px 8px;
     font-size:11.5px; overflow:hidden; color:#fff; border-left:3px solid rgba(0,0,0,.25);
+    display:flex; flex-direction:column; justify-content:center; gap:1px;
   }
-  .block .bcode{ font-family:var(--mono); font-weight:600; display:block; }
-  .block .btime{ font-family:var(--mono); font-size:10.5px; opacity:.9; display:block; }
+  .block .bcode{ font-family:var(--mono); font-weight:600; display:block; white-space:nowrap; }
+  .block .btime{ font-family:var(--mono); font-size:10.5px; opacity:.9; display:block; white-space:nowrap; }
   .block .broom{ font-size:10px; opacity:.85; display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
   .gap-badge{
-    position:absolute; left:50%; transform:translate(-50%,-50%);
+    position:absolute; top:50%; left:0; transform:translate(-50%,-50%);
     font-family:var(--mono); font-size:9.5px; padding:1px 5px; border-radius:8px;
     white-space:nowrap; z-index:2;
   }
@@ -287,10 +334,34 @@
           <button type="button" class="subtle" id="cancel-edit-btn" style="display:none;">Cancel edit</button>
         </div>
 
-        <div class="filter-row" style="margin-top:16px;">
-          <input type="text" id="catalog-filter" placeholder="Filter catalog by code…">
+        <div class="catalog-header-row" style="margin-top:16px; display:flex; align-items:center; justify-content:space-between; gap:8px;">
+          <span class="catalog-header-lbl">Your catalog <span class="count" id="catalog-count"></span></span>
+          <button type="button" class="subtle" id="catalog-toggle-btn">Collapse</button>
         </div>
-        <div class="catalog-list" id="catalog-list"></div>
+        <div id="catalog-body">
+          <div class="filter-row">
+            <input type="text" id="catalog-filter" placeholder="Filter catalog by code or name…">
+          </div>
+          <label for="catalog-day-filter" style="margin-top:8px;">Filter by meeting day &amp; time</label>
+          <div class="filter-row time-filter-row">
+            <select id="catalog-day-filter">
+              <option value="">Any day</option>
+              <option value="Sun">Sun</option>
+              <option value="Mon">Mon</option>
+              <option value="Tue">Tue</option>
+              <option value="Wed">Wed</option>
+              <option value="Thu">Thu</option>
+              <option value="Fri">Fri</option>
+              <option value="Sat">Sat</option>
+            </select>
+            <input type="time" id="catalog-start-filter" title="Meets at/after this time">
+            <span class="time-filter-sep">–</span>
+            <input type="time" id="catalog-end-filter" title="Meets at/before this time">
+            <button type="button" class="subtle" id="catalog-time-clear-btn">Clear</button>
+          </div>
+          <p class="sub time-filter-hint" id="time-filter-hint" style="display:none;"></p>
+          <div class="catalog-list" id="catalog-list"></div>
+        </div>
       </div>
     </div>
 
@@ -305,12 +376,37 @@
         <input type="checkbox" id="exclude-full-toggle" checked>
         <label for="exclude-full-toggle" style="margin:0;">Only consider sections with open seats</label>
       </div>
+      <label for="select-day-filter" style="margin-top:8px;">Filter sections by meeting day &amp; time</label>
+      <div class="filter-row time-filter-row">
+        <select id="select-day-filter">
+          <option value="">Any day</option>
+          <option value="Sun">Sun</option>
+          <option value="Mon">Mon</option>
+          <option value="Tue">Tue</option>
+          <option value="Wed">Wed</option>
+          <option value="Thu">Thu</option>
+          <option value="Fri">Fri</option>
+          <option value="Sat">Sat</option>
+        </select>
+        <input type="time" id="select-start-filter" title="Starts at/after this time">
+        <span class="time-filter-sep">–</span>
+        <input type="time" id="select-end-filter" title="Ends at/before this time">
+        <button type="button" class="subtle" id="select-time-clear-btn">Clear</button>
+      </div>
+      <p class="sub time-filter-hint" id="select-time-filter-hint" style="display:none;"></p>
       <div class="select-list" id="select-list">
         <div class="empty-hint">Add courses to your catalog to see them here.</div>
       </div>
       <div class="generate-bar">
         <button type="button" id="generate-btn">Build schedule</button>
         <span class="count" id="selected-count"></span>
+      </div>
+      <div class="preview-box">
+        <div class="preview-box-title">Your picks so far</div>
+        <p class="sub" style="margin:2px 0 8px;">Timings you've clicked above, laid out by day — updates live, before you build the full schedule.</p>
+        <div id="preview-list">
+          <div class="empty-hint">Click a timing above to preview your picks here.</div>
+        </div>
       </div>
     </div>
   </div>
@@ -320,7 +416,7 @@
     <div id="conflict-area"></div>
     <div class="summary-strip" id="summary-strip"></div>
     <div class="calendar-wrap">
-      <div class="day-header-row" id="day-header-row"></div>
+      <div class="time-header-row" id="time-header-row"></div>
       <div class="calendar" id="calendar"></div>
     </div>
   </div>
@@ -344,7 +440,7 @@
   const DAY_SHORT = {Sun:'Su',Mon:'Mo',Tue:'Tu',Wed:'We',Thu:'Th',Fri:'Fr',Sat:'Sa'};
   const STORAGE_KEY = 'course-planner-v2';
 
-  let state = { courses: [], completed: [], desired: [] };
+  let state = { courses: [], completed: [], desired: [], sectionPref: {} };
   let pendingBlocks = [];
   let pendingSections = [];
   let pendingDays = new Set();
@@ -359,6 +455,7 @@
         state.courses = parsed.courses || [];
         state.completed = parsed.completed || [];
         state.desired = parsed.desired || [];
+        state.sectionPref = parsed.sectionPref || {};
       }
     }catch(e){ console.warn('Could not load saved data', e); }
   }
@@ -568,13 +665,68 @@
     return 'open';
   }
 
+  // ---------- shared day/time filter helpers ----------
+  // Reads a {day, start, end} filter from a trio of controls. start/end are minute values
+  // (or null when that field is blank — meaning "no bound on that side").
+  function readTimeFilter(dayId, startId, endId){
+    const day = document.getElementById(dayId).value;
+    const startRaw = document.getElementById(startId).value;
+    const endRaw = document.getElementById(endId).value;
+    const start = startRaw ? timeToMin(startRaw) : null;
+    const end = endRaw ? timeToMin(endRaw) : null;
+    return { day, start, end, active: !!(day || start!==null || end!==null) };
+  }
+  // A section matches if ANY of its meeting blocks falls on the chosen day (when set) and
+  // starts at/after + ends at/before the given bounds (when set).
+  function sectionMatchesTimeFilter(sec, filter){
+    if(!filter.active) return true;
+    return sec.blocks.some(b=>{
+      if(filter.day && !b.days.includes(filter.day)) return false;
+      const bStart = timeToMin(b.start), bEnd = timeToMin(b.end);
+      if(filter.start!==null && bStart < filter.start) return false;
+      if(filter.end!==null && bEnd > filter.end) return false;
+      return true;
+    });
+  }
+  function timeFilterDescription(filter){
+    const parts = [];
+    if(filter.day) parts.push('on ' + filter.day);
+    if(filter.start!==null) parts.push('starting at/after ' + minToLabel(filter.start));
+    if(filter.end!==null) parts.push('ending at/before ' + minToLabel(filter.end));
+    return parts.join(', ');
+  }
+
+  // ---------- catalog collapse ----------
+  let catalogCollapsed = false;
+  function applyCatalogCollapsed(){
+    document.getElementById('catalog-body').style.display = catalogCollapsed ? 'none' : '';
+    document.getElementById('catalog-toggle-btn').textContent = catalogCollapsed ? 'Expand' : 'Collapse';
+  }
+  document.getElementById('catalog-toggle-btn').addEventListener('click', ()=>{
+    catalogCollapsed = !catalogCollapsed;
+    applyCatalogCollapsed();
+  });
+
   // ---------- catalog list ----------
   function renderCatalogList(){
     const wrap = document.getElementById('catalog-list');
     const filter = (document.getElementById('catalog-filter').value || '').trim().toUpperCase();
+    const timeFilter = readTimeFilter('catalog-day-filter', 'catalog-start-filter', 'catalog-end-filter');
     wrap.innerHTML = '';
+
+    document.getElementById('catalog-count').textContent = state.courses.length ? `(${state.courses.length})` : '';
+
+    const hint = document.getElementById('time-filter-hint');
+    if(timeFilter.active){
+      hint.textContent = 'Showing courses with a section ' + timeFilterDescription(timeFilter) + '.';
+      hint.style.display = '';
+    } else {
+      hint.style.display = 'none';
+    }
+
     let list = state.courses;
     if(filter) list = list.filter(c => c.code.toUpperCase().includes(filter) || (c.name||'').toUpperCase().includes(filter));
+    if(timeFilter.active) list = list.filter(c => c.sections.some(sec => sectionMatchesTimeFilter(sec, timeFilter)));
     if(state.courses.length===0){
       wrap.innerHTML = '<div class="empty-hint">No courses added yet.</div>';
       return;
@@ -618,6 +770,15 @@
     });
   }
   document.getElementById('catalog-filter').addEventListener('input', renderCatalogList);
+  document.getElementById('catalog-day-filter').addEventListener('change', renderCatalogList);
+  document.getElementById('catalog-start-filter').addEventListener('input', renderCatalogList);
+  document.getElementById('catalog-end-filter').addEventListener('input', renderCatalogList);
+  document.getElementById('catalog-time-clear-btn').addEventListener('click', ()=>{
+    document.getElementById('catalog-day-filter').value = '';
+    document.getElementById('catalog-start-filter').value = '';
+    document.getElementById('catalog-end-filter').value = '';
+    renderCatalogList();
+  });
 
   // ---------- eligibility ----------
   function eligibility(course){
@@ -625,6 +786,29 @@
     const missing = course.prereqs.filter(p=>!state.completed.includes(p));
     if(missing.length>0) return { status:'locked', missing };
     return { status:'ok' };
+  }
+
+  // ---------- timing / clash preview helpers (for the pick-courses list) ----------
+  function blocksForSectionDisplay(sec){
+    return sec.blocks.flatMap(b => b.days.map(day => ({ day, startMin: timeToMin(b.start), endMin: timeToMin(b.end) })));
+  }
+  function formatBlockTiming(b){
+    const days = b.days.map(d=>DAY_SHORT[d]).join('/');
+    return `${days} (${minToLabel(timeToMin(b.start))}–${minToLabel(timeToMin(b.end))})`;
+  }
+  function minutesLabel(mins){
+    const h = Math.floor(mins/60), m = mins%60;
+    return (h>0 ? h+'h ' : '') + m + 'm';
+  }
+  function toggleSectionPref(courseId, sectionId){
+    if(state.sectionPref[courseId] === sectionId){
+      delete state.sectionPref[courseId];
+    } else {
+      state.sectionPref[courseId] = sectionId;
+      if(!state.desired.includes(courseId)) state.desired.push(courseId);
+    }
+    save();
+    renderSelectList();
   }
 
   // ---------- selection list ----------
@@ -635,11 +819,18 @@
     if(state.courses.length===0){
       wrap.innerHTML = '<div class="empty-hint">Add courses to your catalog to see them here.</div>';
       document.getElementById('selected-count').textContent = '';
+      renderPreview();
       return;
     }
     state.desired = state.desired.filter(id=>{
       const c = state.courses.find(c=>c.id===id);
       return c && eligibility(c).status === 'ok';
+    });
+    Object.keys(state.sectionPref).forEach(courseId=>{
+      const c = state.courses.find(cc=>cc.id===courseId);
+      if(!c || eligibility(c).status!=='ok' || !c.sections.some(s=>s.id===state.sectionPref[courseId])){
+        delete state.sectionPref[courseId];
+      }
     });
 
     let list = state.courses;
@@ -647,6 +838,17 @@
 
     if(list.length===0){
       wrap.innerHTML = '<div class="empty-hint">No courses match that filter.</div>';
+    }
+
+    const excludeFullPreview = document.getElementById('exclude-full-toggle').checked;
+    const timeFilter = readTimeFilter('select-day-filter', 'select-start-filter', 'select-end-filter');
+
+    const timeHint = document.getElementById('select-time-filter-hint');
+    if(timeFilter.active){
+      timeHint.textContent = 'Only showing sections ' + timeFilterDescription(timeFilter) + '.';
+      timeHint.style.display = '';
+    } else {
+      timeHint.style.display = 'none';
     }
 
     list.forEach(c=>{
@@ -659,9 +861,9 @@
       cb.checked = state.desired.includes(c.id);
       cb.addEventListener('change', ()=>{
         if(cb.checked) state.desired.push(c.id);
-        else state.desired = state.desired.filter(d=>d!==c.id);
+        else { state.desired = state.desired.filter(d=>d!==c.id); delete state.sectionPref[c.id]; }
         save();
-        document.getElementById('selected-count').textContent = state.desired.length + ' selected';
+        renderSelectList();
       });
       const info = document.createElement('div');
       info.className = 'info';
@@ -672,12 +874,225 @@
       } else if(elig.status==='locked') statusHtml = `<div class="status locked">needs: ${elig.missing.join(', ')}</div>`;
       else statusHtml = '<div class="status done">already completed</div>';
       info.innerHTML = `<span class="code">${c.code}</span><span class="name">${c.name||''}</span>${statusHtml}`;
+
+      if(elig.status==='ok'){
+        let secs = c.sections;
+        if(excludeFullPreview) secs = secs.filter(s=>!isClosed(s));
+        const beforeTimeFilterCount = secs.length;
+        if(timeFilter.active) secs = secs.filter(s=>sectionMatchesTimeFilter(s, timeFilter));
+        const hiddenByTimeCount = beforeTimeFilterCount - secs.length;
+
+        // Reference blocks: for each OTHER checked course, use the section you've actually
+        // picked (if you've clicked one) — not every section it offers. Only fall back to
+        // "all of its sections" when you haven't picked one yet, so we stay conservative
+        // until you narrow it down.
+        const refBlocks = [];
+        state.desired.filter(id=>id!==c.id).forEach(id=>{
+          const oc = state.courses.find(cc=>cc.id===id);
+          if(!oc) return;
+          let oSecs = oc.sections;
+          if(excludeFullPreview) oSecs = oSecs.filter(s=>!isClosed(s));
+          const ocPref = state.sectionPref[id];
+          if(ocPref){
+            const chosen = oc.sections.find(s=>s.id===ocPref);
+            if(chosen) oSecs = [chosen];
+          }
+          oSecs.forEach(s=> refBlocks.push(...blocksForSectionDisplay(s)));
+        });
+
+        const candidates = secs.map(s=>{
+          const blocks = blocksForSectionDisplay(s);
+          const clash = blocks.some(nb => refBlocks.some(rb => rb.day===nb.day && rb.startMin<nb.endMin && nb.startMin<rb.endMin));
+          return { sec:s, blocks, clash };
+        });
+        let visible = candidates.filter(cand=>!cand.clash);
+        const hiddenClashCount = candidates.length - visible.length;
+
+        // Least gap to the nearest same-day reference block sorts first (highest priority = tightest fit).
+        // Sections with no same-day neighbor to gauge against have no gap value and sort last.
+        //
+        // gapScore is the single SMALLEST gap found across all of the section's meetings —
+        // not a sum/total across meetings. Summing would unfairly inflate the score for a
+        // section that meets more often in the week (e.g. MWF vs TTh), even when its actual
+        // closest gap on any given day is tighter than a less-frequent section's. "Tightest
+        // fit" should mean "closest it ever sits to another pick", a single comparable number,
+        // not "cumulative minutes across the week".
+        visible.forEach(cand=>{
+          let minGap = Infinity;
+          cand.blocks.forEach(nb=>{
+            refBlocks.filter(rb=>rb.day===nb.day).forEach(rb=>{
+              if(rb.endMin<=nb.startMin) minGap = Math.min(minGap, nb.startMin-rb.endMin);
+              else if(nb.endMin<=rb.startMin) minGap = Math.min(minGap, rb.startMin-nb.endMin);
+            });
+          });
+          cand.hasGap = minGap!==Infinity;
+          cand.gapScore = cand.hasGap ? minGap : Number.MAX_SAFE_INTEGER;
+          cand.earliestStart = Math.min(...cand.blocks.map(b=>b.startMin));
+        });
+        visible.sort((a,b)=> a.gapScore-b.gapScore || a.earliestStart-b.earliestStart);
+        if(visible.length>1 && visible[0].hasGap) visible[0].isBest = true;
+
+        // Once a section is chosen for this course, hide its siblings — click the chosen
+        // one again (it un-picks) to bring the rest back into view.
+        const pref = state.sectionPref[c.id];
+        let lockedToPref = false;
+        let hiddenByLockCount = 0;
+        if(pref && visible.some(cand=>cand.sec.id===pref)){
+          hiddenByLockCount = visible.length - 1;
+          visible = visible.filter(cand=>cand.sec.id===pref);
+          lockedToPref = true;
+        }
+
+        const timingList = document.createElement('div');
+        timingList.className = 'timing-list';
+
+        if(visible.length>0){
+          visible.forEach(cand=>{
+            const sec = cand.sec;
+            const isSelected = state.sectionPref[c.id] === sec.id;
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'timing-block' + (isSelected ? ' selected' : '') + (cand.isBest ? ' best-gap' : '');
+            btn.title = isSelected ? 'Click to unpick this section' : 'Click to pick this section for ' + c.code;
+            btn.addEventListener('click', ()=> toggleSectionPref(c.id, sec.id));
+
+            const head = document.createElement('div');
+            head.className = 'timing-block-head';
+            const lbl = document.createElement('span');
+            lbl.className = 'lbl';
+            lbl.textContent = sec.label;
+            if(cand.isBest){
+              const bestTag = document.createElement('span');
+              bestTag.className = 'best-tag';
+              bestTag.textContent = 'Tightest fit';
+              lbl.appendChild(document.createTextNode(' '));
+              lbl.appendChild(bestTag);
+            }
+            head.appendChild(lbl);
+
+            const right = document.createElement('span');
+            right.className = 'timing-block-head-right';
+            if(cand.hasGap){
+              const gapChip = document.createElement('span');
+              gapChip.className = 'gap-chip' + (cand.isBest ? ' best' : '');
+              gapChip.textContent = 'Gap ' + minutesLabel(cand.gapScore);
+              right.appendChild(gapChip);
+            }
+            if(sec.capacity){
+              const cap = document.createElement('span');
+              cap.className = 'cap-badge ' + capBadgeClass(sec);
+              cap.textContent = sec.capacity.enrolled + '/' + sec.capacity.total;
+              right.appendChild(cap);
+            }
+            head.appendChild(right);
+            btn.appendChild(head);
+
+            // Every meeting block in the section (lecture, lab, etc.) is listed inside the same block.
+            sec.blocks.forEach(b=>{
+              const line = document.createElement('div');
+              line.className = 'timing-block-line';
+              line.textContent = b.room ? `${formatBlockTiming(b)} · ${b.room}` : formatBlockTiming(b);
+              btn.appendChild(line);
+            });
+
+            timingList.appendChild(btn);
+          });
+          if(lockedToPref && hiddenByLockCount>0){
+            const note = document.createElement('div');
+            note.className = 'timing-note';
+            note.textContent = `${hiddenByLockCount} other section${hiddenByLockCount!==1?'s':''} hidden while this one is picked — click it again to compare`;
+            timingList.appendChild(note);
+          } else if(hiddenClashCount>0){
+            const note = document.createElement('div');
+            note.className = 'timing-note';
+            note.textContent = `${hiddenClashCount} section${hiddenClashCount!==1?'s':''} hidden — clashes with your other picks`;
+            timingList.appendChild(note);
+          }
+          if(hiddenByTimeCount>0){
+            const timeNote = document.createElement('div');
+            timeNote.className = 'timing-note';
+            timeNote.textContent = `${hiddenByTimeCount} section${hiddenByTimeCount!==1?'s':''} hidden by your day/time filter`;
+            timingList.appendChild(timeNote);
+          }
+        } else if(candidates.length>0){
+          const note = document.createElement('div');
+          note.className = 'timing-note';
+          note.textContent = 'Every section clashes with your other picks';
+          timingList.appendChild(note);
+        } else if(hiddenByTimeCount>0){
+          const note = document.createElement('div');
+          note.className = 'timing-note';
+          note.textContent = 'Every section hidden by your day/time filter';
+          timingList.appendChild(note);
+        }
+        info.appendChild(timingList);
+      }
+
       row.appendChild(cb); row.appendChild(info);
       wrap.appendChild(row);
     });
     document.getElementById('selected-count').textContent = state.desired.length + ' selected';
+    renderPreview();
   }
   document.getElementById('select-filter').addEventListener('input', renderSelectList);
+  document.getElementById('select-day-filter').addEventListener('change', renderSelectList);
+  document.getElementById('select-start-filter').addEventListener('input', renderSelectList);
+  document.getElementById('select-end-filter').addEventListener('input', renderSelectList);
+  document.getElementById('select-time-clear-btn').addEventListener('click', ()=>{
+    document.getElementById('select-day-filter').value = '';
+    document.getElementById('select-start-filter').value = '';
+    document.getElementById('select-end-filter').value = '';
+    renderSelectList();
+  });
+
+  // ---------- live preview of picked timings (before "Build schedule") ----------
+  function renderPreview(){
+    const wrap = document.getElementById('preview-list');
+    if(!wrap) return;
+    wrap.innerHTML = '';
+    const picks = [];
+    Object.keys(state.sectionPref).forEach(courseId=>{
+      const c = state.courses.find(cc=>cc.id===courseId);
+      if(!c) return;
+      const sec = c.sections.find(s=>s.id===state.sectionPref[courseId]);
+      if(!sec) return;
+      blocksForSectionDisplay(sec).forEach(b=> picks.push(Object.assign({}, b, { course:c, sec })));
+    });
+    if(picks.length===0){
+      wrap.innerHTML = '<div class="empty-hint">Click a timing above to preview your picks here.</div>';
+      return;
+    }
+    const byDay = {};
+    picks.forEach(p=>{ (byDay[p.day] = byDay[p.day]||[]).push(p); });
+    DAYS.forEach(day=>{
+      if(!byDay[day]) return;
+      const arr = byDay[day].slice().sort((a,b)=>a.startMin-b.startMin);
+      const dayRow = document.createElement('div');
+      dayRow.className = 'preview-day';
+      const dayLbl = document.createElement('span');
+      dayLbl.className = 'preview-day-lbl';
+      dayLbl.textContent = day;
+      dayRow.appendChild(dayLbl);
+      const chips = document.createElement('span');
+      chips.className = 'preview-chips';
+      arr.forEach((p,i)=>{
+        if(i>0){
+          const gap = p.startMin - arr[i-1].endMin;
+          const gapSpan = document.createElement('span');
+          gapSpan.className = 'preview-gap' + (gap<0 ? ' clash' : '');
+          gapSpan.textContent = gap<0 ? 'overlap' : (gap===0 ? 'back-to-back' : minutesLabel(gap));
+          chips.appendChild(gapSpan);
+        }
+        const chip = document.createElement('span');
+        chip.className = 'preview-chip';
+        chip.textContent = `${p.course.code} ${p.sec.label} (${minToLabel(p.startMin)}–${minToLabel(p.endMin)})`;
+        chips.appendChild(chip);
+      });
+      dayRow.appendChild(chips);
+      wrap.appendChild(dayRow);
+    });
+  }
 
   // ---------- scheduler ----------
   function blocksForSection(course, sec){
@@ -706,6 +1121,11 @@
     const effective = courses.map(c=>{
       let secs = c.sections;
       if(excludeFull) secs = secs.filter(s=>!isClosed(s));
+      const pref = state.sectionPref[c.id];
+      if(pref){
+        const preferredSec = secs.find(s=>s.id===pref);
+        if(preferredSec) secs = [preferredSec];
+      }
       return { course: c, sections: secs };
     });
     const ordered = effective.slice().sort((a,b)=>a.sections.length-b.sections.length);
@@ -769,7 +1189,7 @@
       document.getElementById('conflict-area').innerHTML = '<div class="conflict-box"><strong>Nothing to schedule</strong>Select at least one eligible course above.</div>';
       document.getElementById('summary-strip').innerHTML = '';
       document.getElementById('calendar').innerHTML = '';
-      document.getElementById('day-header-row').innerHTML = '';
+      document.getElementById('time-header-row').innerHTML = '';
       return;
     }
     const best = scheduleCourses(selected, excludeFull);
@@ -784,7 +1204,7 @@
     const conflictArea = document.getElementById('conflict-area');
     const summaryStrip = document.getElementById('summary-strip');
     const calendar = document.getElementById('calendar');
-    const headerRow = document.getElementById('day-header-row');
+    const headerRow = document.getElementById('time-header-row');
     conflictArea.innerHTML = '';
     calendar.innerHTML = '';
     headerRow.innerHTML = '';
@@ -834,50 +1254,52 @@
     minMin = Math.max(minMin, 6*60);
     maxMin = Math.min(maxMin, 23*60);
     const span = maxMin - minMin;
-    const PX_PER_MIN = 1.15;
-    const totalHeight = span * PX_PER_MIN;
+    const PX_PER_MIN = 1.3;
+    const totalWidth = Math.max(span * PX_PER_MIN, 900);
 
     const spacer = document.createElement('div');
-    spacer.className = 'time-axis-spacer';
+    spacer.className = 'day-axis-spacer';
     headerRow.appendChild(spacer);
-    dayList.forEach(d=>{
-      const h = document.createElement('div');
-      h.className = 'day-header';
-      h.textContent = d;
-      headerRow.appendChild(h);
-    });
 
-    const axis = document.createElement('div');
-    axis.className = 'time-axis';
-    axis.style.height = totalHeight + 'px';
+    const timeHeader = document.createElement('div');
+    timeHeader.className = 'time-header';
+    timeHeader.style.minWidth = totalWidth + 'px';
     for(let m=minMin; m<=maxMin; m+=60){
       const lbl = document.createElement('div');
       lbl.className = 'lbl';
-      lbl.style.top = ((m-minMin)*PX_PER_MIN) + 'px';
+      lbl.style.left = ((m-minMin)*PX_PER_MIN) + 'px';
       lbl.textContent = minToLabel(m);
-      axis.appendChild(lbl);
+      timeHeader.appendChild(lbl);
     }
-    calendar.appendChild(axis);
+    headerRow.appendChild(timeHeader);
 
     dayList.forEach(day=>{
-      const col = document.createElement('div');
-      col.className = 'day-col';
-      col.style.height = totalHeight + 'px';
+      const row = document.createElement('div');
+      row.className = 'day-row';
+
+      const label = document.createElement('div');
+      label.className = 'day-label';
+      label.textContent = day;
+      row.appendChild(label);
+
+      const track = document.createElement('div');
+      track.className = 'day-track';
+      track.style.minWidth = totalWidth + 'px';
       for(let m=minMin; m<=maxMin; m+=60){
         const line = document.createElement('div');
-        line.className = 'hline';
-        line.style.top = ((m-minMin)*PX_PER_MIN) + 'px';
-        col.appendChild(line);
+        line.className = 'vline';
+        line.style.left = ((m-minMin)*PX_PER_MIN) + 'px';
+        track.appendChild(line);
       }
       const dayBlocks = placedBlocks.filter(b=>b.day===day).sort((a,b)=>a.startMin-b.startMin);
       dayBlocks.forEach(b=>{
         const el = document.createElement('div');
         el.className = 'block';
-        el.style.top = ((b.startMin-minMin)*PX_PER_MIN) + 'px';
-        el.style.height = Math.max((b.endMin-b.startMin)*PX_PER_MIN, 28) + 'px';
+        el.style.left = ((b.startMin-minMin)*PX_PER_MIN) + 'px';
+        el.style.width = Math.max((b.endMin-b.startMin)*PX_PER_MIN, 60) + 'px';
         el.style.background = colorMap[b.course.id];
         el.innerHTML = `<span class="bcode">${b.course.code}</span><span class="btime">${minToLabel(b.startMin)}–${minToLabel(b.endMin)}</span>${b.room?`<span class="broom">${b.room}</span>`:''}`;
-        col.appendChild(el);
+        track.appendChild(el);
       });
       for(let i=1;i<dayBlocks.length;i++){
         const gap = dayBlocks[i].startMin - dayBlocks[i-1].endMin;
@@ -886,12 +1308,13 @@
           const cls = gap<=15 ? 'tight' : gap>60 ? 'long' : 'mid';
           badge.className = 'gap-badge ' + cls;
           const midMin = (dayBlocks[i-1].endMin + dayBlocks[i].startMin)/2;
-          badge.style.top = ((midMin-minMin)*PX_PER_MIN) + 'px';
+          badge.style.left = ((midMin-minMin)*PX_PER_MIN) + 'px';
           badge.textContent = gap + 'm';
-          col.appendChild(badge);
+          track.appendChild(badge);
         }
       }
-      calendar.appendChild(col);
+      row.appendChild(track);
+      calendar.appendChild(row);
     });
   }
 
@@ -949,6 +1372,7 @@
           state.courses = incoming;
           state.completed = parsed.completed || [];
           state.desired = parsed.desired || [];
+          state.sectionPref = parsed.sectionPref || {};
         }
         save(); renderAll();
         alert('Data imported: ' + incoming.length + ' course(s) in the file.');
@@ -960,7 +1384,7 @@
 
   document.getElementById('clear-btn').addEventListener('click', ()=>{
     if(!confirm('This clears your catalog, completed courses, and selections. This cannot be undone unless you exported first. Continue?')) return;
-    state = { courses:[], completed:[], desired:[] };
+    state = { courses:[], completed:[], desired:[], sectionPref:{} };
     save(); renderAll();
     document.getElementById('results').style.display = 'none';
   });
@@ -976,6 +1400,7 @@
 
   load();
   renderDayToggles();
+  applyCatalogCollapsed();
   renderAll();
 })();
 </script>
