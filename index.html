@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coursework — Term Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2A41;
+    --paper:#FAFAF7;
+    --paper-alt:#F1EEE4;
+    --rule:#DDD8CB;
+    --green:#3C6E47;
+    --green-bg:#E7EFE6;
+    --amber:#C97A2B;
+    --amber-bg:#F6EADA;
+    --red:#B14A3D;
+    --red-bg:#F5E6E1;
+    --slate:#5B6470;
+    --serif: 'Fraunces', serif;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', -apple-system, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:var(--sans); line-height:1.5; font-size:15px;
+  }
+  header.top{
+    padding:28px clamp(16px,4vw,48px) 20px; border-bottom:1px solid var(--rule);
+    display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:8px;
+  }
+  header.top h1{
+    font-family:var(--serif); font-weight:600; font-size:clamp(24px,3.4vw,32px);
+    margin:0; letter-spacing:-0.01em;
+  }
+  header.top .tag{ color:var(--slate); font-size:14px; }
+  main{ padding: 24px clamp(16px,4vw,48px) 60px; max-width:1400px; margin:0 auto; }
+
+  .layout{ display:grid; grid-template-columns: 400px 1fr; gap:20px; align-items:start; }
+  @media (max-width:960px){ .layout{ grid-template-columns: 1fr; } }
+
+  .panel{
+    background:var(--paper-alt); border:1px solid var(--rule); border-radius:2px;
+    padding:18px 18px 20px;
+  }
+  .panel + .panel{ margin-top:16px; }
+  .panel h2{
+    font-family:var(--serif); font-weight:600; font-size:18px; margin:0 0 4px;
+  }
+  .panel .sub{ color:var(--slate); font-size:13px; margin:0 0 14px; }
+
+  label{ display:block; font-size:12.5px; color:var(--slate); margin:10px 0 4px; }
+  input[type=text], input[type=number], textarea, select{
+    width:100%; padding:8px 9px; border:1px solid var(--rule); background:var(--paper);
+    border-radius:2px; font-family:var(--sans); font-size:14px; color:var(--ink);
+  }
+  input[type=time]{
+    padding:6px 8px; border:1px solid var(--rule); background:var(--paper); border-radius:2px;
+    font-family:var(--mono); font-size:13px; color:var(--ink);
+  }
+  input:focus, textarea:focus, select:focus, button:focus{
+    outline:2px solid var(--ink); outline-offset:1px;
+  }
+
+  button{
+    font-family:var(--sans); font-size:13px; font-weight:500; cursor:pointer;
+    border:1px solid var(--ink); background:var(--ink); color:var(--paper);
+    padding:8px 14px; border-radius:2px; transition:opacity .12s;
+  }
+  button:hover{ opacity:.85; }
+  button.ghost{ background:transparent; color:var(--ink); }
+  button.subtle{ background:transparent; border-color:var(--rule); color:var(--slate); font-weight:400; padding:6px 10px; }
+  button.danger{ background:transparent; border-color:var(--red); color:var(--red); }
+  button:disabled{ opacity:.4; cursor:not-allowed; }
+
+  .day-toggle-row{ display:flex; gap:4px; flex-wrap:wrap; margin-top:4px; }
+  .day-toggle{
+    font-family:var(--mono); font-size:12px; padding:5px 8px; border:1px solid var(--rule);
+    background:var(--paper); border-radius:2px; cursor:pointer; color:var(--slate); user-select:none;
+  }
+  .day-toggle.on{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+
+  .time-row{ display:flex; gap:10px; align-items:end; flex-wrap:wrap; }
+  .time-row > div{ flex:1; min-width:90px; }
+
+  .block-chip, .section-chip{
+    display:flex; justify-content:space-between; align-items:center; gap:8px;
+    font-family:var(--mono); font-size:12px; background:var(--paper);
+    border:1px solid var(--rule); padding:6px 9px; border-radius:2px; margin-top:6px;
+  }
+  .block-chip button, .section-chip button{ padding:2px 8px; font-size:11px; flex-shrink:0; }
+
+  fieldset.section-box{ border:1px solid var(--ink); border-radius:2px; padding:10px 12px 12px; margin:14px 0 0; background:var(--paper); }
+  fieldset.block-box{ border:1px solid var(--rule); border-radius:2px; padding:10px 12px 12px; margin:14px 0 0; }
+  legend{ font-family:var(--mono); font-size:11.5px; color:var(--slate); padding:0 6px; }
+
+  .catalog-list{ margin-top:14px; display:flex; flex-direction:column; gap:8px; max-height:520px; overflow-y:auto; }
+  .course-card{
+    background:var(--paper); border:1px solid var(--rule); border-radius:2px; padding:10px 12px;
+  }
+  .course-card .row1{ display:flex; justify-content:space-between; align-items:baseline; gap:8px; flex-wrap:wrap; }
+  .course-card .code{ font-family:var(--mono); font-weight:600; font-size:13px; }
+  .course-card .name{ font-size:13px; color:var(--slate); }
+  .course-card .meta{ font-size:11.5px; color:var(--slate); margin-top:4px; }
+  .course-card .actions{ margin-top:6px; display:flex; gap:6px; }
+  .course-card details{ margin-top:6px; font-size:12px; }
+  .course-card summary{ cursor:pointer; color:var(--slate); font-family:var(--mono); font-size:11.5px; }
+  .sec-line{ display:flex; justify-content:space-between; gap:8px; padding:4px 0; border-top:1px solid var(--rule); font-family:var(--mono); font-size:11.5px; }
+  .sec-line .blk{ color:var(--slate); }
+
+  .cap-badge{ font-family:var(--mono); font-size:10.5px; padding:1px 6px; border-radius:10px; white-space:nowrap; }
+  .cap-badge.open{ background:var(--green-bg); color:var(--green); border:1px solid var(--green); }
+  .cap-badge.tight{ background:var(--amber-bg); color:var(--amber); border:1px solid var(--amber); }
+  .cap-badge.full{ background:var(--red-bg); color:var(--red); border:1px solid var(--red); }
+
+  .completed-tags{ display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+  .tag{
+    font-family:var(--mono); font-size:12px; background:var(--green-bg); color:var(--green);
+    border:1px solid var(--green); padding:3px 8px 3px 9px; border-radius:20px;
+    display:flex; align-items:center; gap:6px;
+  }
+  .tag button{ background:none; border:none; color:var(--green); padding:0; font-size:13px; line-height:1; }
+
+  .filter-row{ display:flex; gap:8px; align-items:center; margin-bottom:6px; }
+  .filter-row input[type=text]{ flex:1; }
+  .toggle-row{ display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--slate); margin:8px 0; }
+
+  .select-list{ display:flex; flex-direction:column; gap:6px; margin-top:6px; max-height:640px; overflow-y:auto; }
+  .select-row{
+    display:flex; align-items:flex-start; gap:10px; padding:8px 10px;
+    border:1px solid var(--rule); border-radius:2px; background:var(--paper);
+  }
+  .select-row.locked{ opacity:.55; }
+  .select-row.done{ opacity:.4; }
+  .select-row input[type=checkbox]{ margin-top:3px; }
+  .select-row .info{ flex:1; }
+  .select-row .code{ font-family:var(--mono); font-weight:600; font-size:13px; }
+  .select-row .name{ font-size:13px; color:var(--slate); margin-left:6px;}
+  .select-row .status{ font-size:11.5px; margin-top:2px; }
+  .status.ok{ color:var(--green); }
+  .status.locked{ color:var(--amber); }
+  .status.done{ color:var(--slate); }
+
+  .generate-bar{ display:flex; align-items:center; gap:12px; margin-top:16px; flex-wrap:wrap; }
+  .generate-bar .count{ font-size:13px; color:var(--slate); }
+
+  .results{ margin-top:28px; }
+  .results h2{ font-family:var(--serif); font-weight:600; font-size:20px; margin:0 0 4px; }
+
+  .conflict-box{
+    background:var(--amber-bg); border:1px solid var(--amber); color:#7A4E1D;
+    padding:12px 14px; border-radius:2px; font-size:13.5px; margin-bottom:16px;
+  }
+  .conflict-box strong{ display:block; margin-bottom:4px; font-family:var(--serif); font-size:15px; color:var(--amber); }
+
+  .summary-strip{
+    display:flex; gap:24px; flex-wrap:wrap; margin:10px 0 18px;
+    font-family:var(--mono); font-size:13px; color:var(--slate);
+  }
+  .summary-strip b{ color:var(--ink); font-size:16px; display:block; font-family:var(--serif); font-weight:600; }
+
+  .calendar-wrap{ overflow-x:auto; border:1px solid var(--rule); background:var(--paper); }
+  .calendar{ display:flex; min-width:760px; }
+  .time-axis{ position:relative; width:56px; flex-shrink:0; border-right:1px solid var(--rule); }
+  .time-axis .lbl{
+    position:absolute; right:8px; transform:translateY(-50%); font-family:var(--mono);
+    font-size:11px; color:var(--slate);
+  }
+  .day-col{ position:relative; flex:1; min-width:120px; border-right:1px solid var(--rule); }
+  .day-col:last-child{ border-right:none; }
+  .day-col .hline{ position:absolute; left:0; right:0; border-top:1px solid var(--rule); }
+  .day-header{
+    text-align:center; font-family:var(--mono); font-size:11.5px; letter-spacing:.03em;
+    color:var(--slate); padding:8px 4px; border-bottom:1px solid var(--rule); background:var(--paper-alt);
+  }
+  .day-header-row{ display:flex; }
+  .day-header-row .time-axis-spacer{ width:56px; flex-shrink:0; border-right:1px solid var(--rule); }
+  .day-header-row .day-header{ flex:1; min-width:120px; border-right:1px solid var(--rule); }
+  .day-header-row .day-header:last-child{ border-right:none; }
+
+  .block{
+    position:absolute; left:3px; right:3px; border-radius:2px; padding:5px 7px;
+    font-size:11.5px; overflow:hidden; color:#fff; border-left:3px solid rgba(0,0,0,.25);
+  }
+  .block .bcode{ font-family:var(--mono); font-weight:600; display:block; }
+  .block .btime{ font-family:var(--mono); font-size:10.5px; opacity:.9; display:block; }
+  .block .broom{ font-size:10px; opacity:.85; display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  .gap-badge{
+    position:absolute; left:50%; transform:translate(-50%,-50%);
+    font-family:var(--mono); font-size:9.5px; padding:1px 5px; border-radius:8px;
+    white-space:nowrap; z-index:2;
+  }
+  .gap-badge.tight{ background:var(--green-bg); color:var(--green); border:1px solid var(--green); }
+  .gap-badge.long{ background:var(--amber-bg); color:var(--amber); border:1px solid var(--amber); }
+  .gap-badge.mid{ background:var(--paper-alt); color:var(--slate); border:1px solid var(--rule); }
+
+  .footer-bar{
+    display:flex; gap:10px; flex-wrap:wrap; margin-top:36px; padding-top:16px;
+    border-top:1px solid var(--rule);
+  }
+  .footer-bar .hint{ color:var(--slate); font-size:12.5px; margin-top:10px; width:100%; }
+
+  .empty-hint{ color:var(--slate); font-size:13.5px; padding:10px 2px; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <h1>Coursework</h1>
+  <div class="tag">a term planner that checks prerequisites and builds the tightest clash-free schedule</div>
+</header>
+
+<main>
+
+  <div class="layout">
+    <!-- LEFT: setup -->
+    <div>
+      <div class="panel">
+        <h2>Courses you've completed</h2>
+        <p class="sub">Enter course codes. These are used to check prerequisites and are hidden from selection.</p>
+        <label for="completed-input">Add a code, press Enter</label>
+        <input type="text" id="completed-input" placeholder="e.g. CSE101">
+        <div class="completed-tags" id="completed-tags"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Course catalog</h2>
+        <p class="sub">Add courses by hand, or import a catalog exported from your school's offered-courses page.</p>
+
+        <label for="course-code">Course code</label>
+        <input type="text" id="course-code" placeholder="e.g. CSE201">
+        <label for="course-name">Course name</label>
+        <input type="text" id="course-name" placeholder="optional">
+        <label for="course-prereqs">Prerequisites (comma-separated codes)</label>
+        <input type="text" id="course-prereqs" placeholder="e.g. CSE101, MATH100">
+
+        <fieldset class="section-box">
+          <legend>Build a section</legend>
+          <p class="sub" style="margin:0 0 6px;">A section can meet at different times on different days (e.g. lecture Mon/Wed, lab Thu) — add one block per distinct time, then save the section.</p>
+
+          <fieldset class="block-box">
+            <legend>Meeting block</legend>
+            <label>Days</label>
+            <div class="day-toggle-row" id="day-toggle-row"></div>
+            <div class="time-row">
+              <div>
+                <label for="sec-start">Start</label>
+                <input type="time" id="sec-start" value="09:00">
+              </div>
+              <div>
+                <label for="sec-end">End</label>
+                <input type="time" id="sec-end" value="09:50">
+              </div>
+              <div>
+                <label for="sec-room">Room</label>
+                <input type="text" id="sec-room" placeholder="optional">
+              </div>
+            </div>
+            <button type="button" class="ghost" id="add-block-btn" style="margin-top:10px;">+ Add block to this section</button>
+            <div id="pending-blocks"></div>
+          </fieldset>
+
+          <div class="time-row" style="margin-top:10px;">
+            <div>
+              <label for="sec-label">Section label</label>
+              <input type="text" id="sec-label" placeholder="e.g. Section 1">
+            </div>
+            <div>
+              <label for="sec-enrolled">Enrolled (optional)</label>
+              <input type="number" id="sec-enrolled" min="0" placeholder="e.g. 20">
+            </div>
+            <div>
+              <label for="sec-total">Capacity (optional)</label>
+              <input type="number" id="sec-total" min="0" placeholder="e.g. 40">
+            </div>
+          </div>
+          <button type="button" id="add-section-btn" style="margin-top:10px;">+ Save this section</button>
+          <div id="pending-sections"></div>
+        </fieldset>
+
+        <div style="margin-top:14px; display:flex; gap:8px;">
+          <button type="button" id="save-course-btn">Save course to catalog</button>
+          <button type="button" class="subtle" id="cancel-edit-btn" style="display:none;">Cancel edit</button>
+        </div>
+
+        <div class="filter-row" style="margin-top:16px;">
+          <input type="text" id="catalog-filter" placeholder="Filter catalog by code…">
+        </div>
+        <div class="catalog-list" id="catalog-list"></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: selection -->
+    <div class="panel">
+      <h2>Pick courses for this term</h2>
+      <p class="sub">Only prerequisite-eligible, not-yet-completed courses can be selected. Check everything you'd like — the planner drops the fewest possible if some can't coexist, and picks the best open section per course automatically.</p>
+      <div class="filter-row">
+        <input type="text" id="select-filter" placeholder="Filter by code or name…">
+      </div>
+      <div class="toggle-row">
+        <input type="checkbox" id="exclude-full-toggle" checked>
+        <label for="exclude-full-toggle" style="margin:0;">Only consider sections with open seats</label>
+      </div>
+      <div class="select-list" id="select-list">
+        <div class="empty-hint">Add courses to your catalog to see them here.</div>
+      </div>
+      <div class="generate-bar">
+        <button type="button" id="generate-btn">Build schedule</button>
+        <span class="count" id="selected-count"></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="results" id="results" style="display:none;">
+    <h2>Your schedule</h2>
+    <div id="conflict-area"></div>
+    <div class="summary-strip" id="summary-strip"></div>
+    <div class="calendar-wrap">
+      <div class="day-header-row" id="day-header-row"></div>
+      <div class="calendar" id="calendar"></div>
+    </div>
+  </div>
+
+  <div class="footer-bar">
+    <button type="button" class="subtle" id="sample-btn">Load sample data</button>
+    <button type="button" class="subtle" id="export-btn">Export data (.json)</button>
+    <button type="button" class="subtle" id="import-btn">Import data</button>
+    <input type="file" id="import-file" accept="application/json" style="display:none;">
+    <button type="button" class="danger" id="clear-btn">Clear everything</button>
+    <div class="hint">Everything is saved in this browser only (localStorage) — nothing is sent to a server. Use Export before clearing your browser data or switching devices.</div>
+  </div>
+
+</main>
+
+<script>
+(function(){
+  "use strict";
+
+  const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const DAY_SHORT = {Sun:'Su',Mon:'Mo',Tue:'Tu',Wed:'We',Thu:'Th',Fri:'Fr',Sat:'Sa'};
+  const STORAGE_KEY = 'course-planner-v2';
+
+  let state = { courses: [], completed: [], desired: [] };
+  let pendingBlocks = [];
+  let pendingSections = [];
+  let pendingDays = new Set();
+  let editingCourseId = null;
+
+  // ---------- persistence ----------
+  function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  function load(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){ const parsed = JSON.parse(raw);
+        state.courses = parsed.courses || [];
+        state.completed = parsed.completed || [];
+        state.desired = parsed.desired || [];
+      }
+    }catch(e){ console.warn('Could not load saved data', e); }
+  }
+
+  function uid(){ return Math.random().toString(36).slice(2,10); }
+
+  // ---------- time helpers ----------
+  function timeToMin(t){ const [h,m] = t.split(':').map(Number); return h*60+m; }
+  function minToLabel(m){
+    let h = Math.floor(m/60), mm = m%60;
+    const ap = h>=12 ? 'PM' : 'AM';
+    let h12 = h%12; if(h12===0) h12=12;
+    return h12 + (mm ? ':'+String(mm).padStart(2,'0') : '') + ' ' + ap;
+  }
+
+  // ---------- day toggle row (block builder) ----------
+  function renderDayToggles(){
+    const row = document.getElementById('day-toggle-row');
+    row.innerHTML = '';
+    DAYS.forEach(d=>{
+      const btn = document.createElement('div');
+      btn.className = 'day-toggle' + (pendingDays.has(d) ? ' on' : '');
+      btn.textContent = DAY_SHORT[d];
+      btn.addEventListener('click', ()=>{
+        if(pendingDays.has(d)) pendingDays.delete(d); else pendingDays.add(d);
+        renderDayToggles();
+      });
+      row.appendChild(btn);
+    });
+  }
+
+  document.getElementById('add-block-btn').addEventListener('click', ()=>{
+    const start = document.getElementById('sec-start').value;
+    const end = document.getElementById('sec-end').value;
+    const room = document.getElementById('sec-room').value.trim();
+    if(pendingDays.size === 0){ alert('Pick at least one day for this block.'); return; }
+    if(!start || !end || timeToMin(end) <= timeToMin(start)){ alert('End time must be after start time.'); return; }
+    pendingBlocks.push({ days: [...pendingDays], start, end, room });
+    pendingDays = new Set();
+    document.getElementById('sec-room').value = '';
+    renderDayToggles();
+    renderPendingBlocks();
+  });
+
+  function renderPendingBlocks(){
+    const wrap = document.getElementById('pending-blocks');
+    wrap.innerHTML = '';
+    pendingBlocks.forEach((b,i)=>{
+      const chip = document.createElement('div');
+      chip.className = 'block-chip';
+      chip.innerHTML = `<span>${b.days.map(d=>DAY_SHORT[d]).join('/')} · ${b.start}–${b.end}${b.room ? ' · '+b.room : ''}</span>`;
+      const rm = document.createElement('button');
+      rm.className = 'subtle'; rm.type = 'button'; rm.textContent = 'Remove';
+      rm.addEventListener('click', ()=>{ pendingBlocks.splice(i,1); renderPendingBlocks(); });
+      chip.appendChild(rm);
+      wrap.appendChild(chip);
+    });
+  }
+
+  document.getElementById('add-section-btn').addEventListener('click', ()=>{
+    if(pendingBlocks.length === 0){ alert('Add at least one meeting block first.'); return; }
+    const label = document.getElementById('sec-label').value.trim() || ('Section ' + (pendingSections.length+1));
+    const enrolledRaw = document.getElementById('sec-enrolled').value;
+    const totalRaw = document.getElementById('sec-total').value;
+    const capacity = (enrolledRaw!=='' || totalRaw!=='') ? {
+      enrolled: enrolledRaw!=='' ? parseInt(enrolledRaw,10) : 0,
+      total: totalRaw!=='' ? parseInt(totalRaw,10) : 0
+    } : null;
+    pendingSections.push({ id: uid(), label, blocks: pendingBlocks, capacity });
+    pendingBlocks = [];
+    document.getElementById('sec-label').value = '';
+    document.getElementById('sec-enrolled').value = '';
+    document.getElementById('sec-total').value = '';
+    renderPendingBlocks();
+    renderPendingSections();
+  });
+
+  function renderPendingSections(){
+    const wrap = document.getElementById('pending-sections');
+    wrap.innerHTML = '';
+    pendingSections.forEach((sec,i)=>{
+      const chip = document.createElement('div');
+      chip.className = 'section-chip';
+      const blockSummary = sec.blocks.map(b=>`${b.days.map(d=>DAY_SHORT[d]).join('/')} ${b.start}-${b.end}`).join(' + ');
+      const capSummary = sec.capacity ? ` · ${sec.capacity.enrolled}/${sec.capacity.total}` : '';
+      chip.innerHTML = `<span>${sec.label}: ${blockSummary}${capSummary}</span>`;
+      const rm = document.createElement('button');
+      rm.className = 'subtle'; rm.type = 'button'; rm.textContent = 'Remove';
+      rm.addEventListener('click', ()=>{ pendingSections.splice(i,1); renderPendingSections(); });
+      chip.appendChild(rm);
+      wrap.appendChild(chip);
+    });
+  }
+
+  // ---------- save course ----------
+  document.getElementById('save-course-btn').addEventListener('click', ()=>{
+    const code = document.getElementById('course-code').value.trim().toUpperCase();
+    const name = document.getElementById('course-name').value.trim();
+    const prereqsRaw = document.getElementById('course-prereqs').value.trim();
+    const prereqs = prereqsRaw ? prereqsRaw.split(',').map(s=>s.trim().toUpperCase()).filter(Boolean) : [];
+
+    if(!code){ alert('Give the course a code.'); return; }
+    if(pendingSections.length === 0){ alert('Save at least one section before saving the course.'); return; }
+    if(!editingCourseId && state.courses.some(c=>c.code===code)){
+      alert('A course with that code already exists. Edit it instead, or use a different code.'); return;
+    }
+
+    if(editingCourseId){
+      const c = state.courses.find(c=>c.id===editingCourseId);
+      c.code = code; c.name = name; c.prereqs = prereqs; c.sections = pendingSections;
+    } else {
+      state.courses.push({ id: uid(), code, name, prereqs, sections: pendingSections });
+    }
+
+    editingCourseId = null;
+    document.getElementById('cancel-edit-btn').style.display = 'none';
+    document.getElementById('save-course-btn').textContent = 'Save course to catalog';
+    document.getElementById('course-code').value = '';
+    document.getElementById('course-name').value = '';
+    document.getElementById('course-prereqs').value = '';
+    pendingSections = [];
+    pendingBlocks = [];
+    renderPendingSections();
+    renderPendingBlocks();
+    save();
+    renderAll();
+  });
+
+  document.getElementById('cancel-edit-btn').addEventListener('click', ()=>{
+    editingCourseId = null;
+    document.getElementById('cancel-edit-btn').style.display = 'none';
+    document.getElementById('save-course-btn').textContent = 'Save course to catalog';
+    document.getElementById('course-code').value = '';
+    document.getElementById('course-name').value = '';
+    document.getElementById('course-prereqs').value = '';
+    pendingSections = [];
+    pendingBlocks = [];
+    renderPendingSections();
+    renderPendingBlocks();
+  });
+
+  function startEditCourse(id){
+    const c = state.courses.find(c=>c.id===id);
+    if(!c) return;
+    editingCourseId = id;
+    document.getElementById('course-code').value = c.code;
+    document.getElementById('course-name').value = c.name || '';
+    document.getElementById('course-prereqs').value = c.prereqs.join(', ');
+    pendingSections = c.sections.map(s=>({...s, blocks: s.blocks.map(b=>({...b, days:[...b.days]}))}));
+    renderPendingSections();
+    document.getElementById('cancel-edit-btn').style.display = 'inline-block';
+    document.getElementById('save-course-btn').textContent = 'Update course';
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function deleteCourse(id){
+    if(!confirm('Remove this course from your catalog?')) return;
+    state.courses = state.courses.filter(c=>c.id!==id);
+    state.desired = state.desired.filter(d=>d!==id);
+    save();
+    renderAll();
+  }
+
+  // ---------- completed courses ----------
+  document.getElementById('completed-input').addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      const v = e.target.value.trim().toUpperCase();
+      if(v && !state.completed.includes(v)){
+        state.completed.push(v);
+        save(); renderAll();
+      }
+      e.target.value = '';
+    }
+  });
+
+  function removeCompleted(code){
+    state.completed = state.completed.filter(c=>c!==code);
+    save(); renderAll();
+  }
+
+  function renderCompletedTags(){
+    const wrap = document.getElementById('completed-tags');
+    wrap.innerHTML = '';
+    state.completed.forEach(code=>{
+      const tag = document.createElement('div');
+      tag.className = 'tag';
+      tag.innerHTML = `<span>${code}</span>`;
+      const rm = document.createElement('button');
+      rm.textContent = '×';
+      rm.addEventListener('click', ()=>removeCompleted(code));
+      tag.appendChild(rm);
+      wrap.appendChild(tag);
+    });
+  }
+
+  // ---------- capacity helpers ----------
+  function isClosed(sec){
+    if(!sec.capacity) return false;
+    return sec.capacity.total === 0 || sec.capacity.enrolled >= sec.capacity.total;
+  }
+  function capBadgeClass(sec){
+    if(!sec.capacity || sec.capacity.total===0) return 'full';
+    const ratio = sec.capacity.enrolled / sec.capacity.total;
+    if(ratio >= 1) return 'full';
+    if(ratio >= 0.85) return 'tight';
+    return 'open';
+  }
+
+  // ---------- catalog list ----------
+  function renderCatalogList(){
+    const wrap = document.getElementById('catalog-list');
+    const filter = (document.getElementById('catalog-filter').value || '').trim().toUpperCase();
+    wrap.innerHTML = '';
+    let list = state.courses;
+    if(filter) list = list.filter(c => c.code.toUpperCase().includes(filter) || (c.name||'').toUpperCase().includes(filter));
+    if(state.courses.length===0){
+      wrap.innerHTML = '<div class="empty-hint">No courses added yet.</div>';
+      return;
+    }
+    if(list.length===0){
+      wrap.innerHTML = '<div class="empty-hint">No courses match that filter.</div>';
+      return;
+    }
+    list.forEach(c=>{
+      const card = document.createElement('div');
+      card.className = 'course-card';
+      card.innerHTML = `
+        <div class="row1"><span class="code">${c.code}</span><span class="name">${c.name||''}</span></div>
+        <div class="meta">${c.prereqs.length ? 'Requires: '+c.prereqs.join(', ') : 'No prerequisites'} · ${c.sections.length} section${c.sections.length!==1?'s':''}</div>
+      `;
+      const details = document.createElement('details');
+      const summary = document.createElement('summary');
+      summary.textContent = 'Show sections';
+      details.appendChild(summary);
+      c.sections.forEach(sec=>{
+        const line = document.createElement('div');
+        line.className = 'sec-line';
+        const blockText = sec.blocks.map(b=>`${b.days.map(d=>DAY_SHORT[d]).join('/')} ${b.start}-${b.end}${b.room?' ('+b.room+')':''}`).join(' + ');
+        let capHtml = '';
+        if(sec.capacity){
+          capHtml = `<span class="cap-badge ${capBadgeClass(sec)}">${sec.capacity.enrolled}/${sec.capacity.total}</span>`;
+        }
+        line.innerHTML = `<span class="blk">${sec.label}: ${blockText}</span>${capHtml}`;
+        details.appendChild(line);
+      });
+      card.appendChild(details);
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+      const editBtn = document.createElement('button'); editBtn.className='subtle'; editBtn.textContent='Edit';
+      editBtn.addEventListener('click', ()=>startEditCourse(c.id));
+      const delBtn = document.createElement('button'); delBtn.className='danger'; delBtn.textContent='Delete';
+      delBtn.addEventListener('click', ()=>deleteCourse(c.id));
+      actions.appendChild(editBtn); actions.appendChild(delBtn);
+      card.appendChild(actions);
+      wrap.appendChild(card);
+    });
+  }
+  document.getElementById('catalog-filter').addEventListener('input', renderCatalogList);
+
+  // ---------- eligibility ----------
+  function eligibility(course){
+    if(state.completed.includes(course.code)) return { status:'done' };
+    const missing = course.prereqs.filter(p=>!state.completed.includes(p));
+    if(missing.length>0) return { status:'locked', missing };
+    return { status:'ok' };
+  }
+
+  // ---------- selection list ----------
+  function renderSelectList(){
+    const wrap = document.getElementById('select-list');
+    const filter = (document.getElementById('select-filter').value || '').trim().toUpperCase();
+    wrap.innerHTML = '';
+    if(state.courses.length===0){
+      wrap.innerHTML = '<div class="empty-hint">Add courses to your catalog to see them here.</div>';
+      document.getElementById('selected-count').textContent = '';
+      return;
+    }
+    state.desired = state.desired.filter(id=>{
+      const c = state.courses.find(c=>c.id===id);
+      return c && eligibility(c).status === 'ok';
+    });
+
+    let list = state.courses;
+    if(filter) list = list.filter(c => c.code.toUpperCase().includes(filter) || (c.name||'').toUpperCase().includes(filter));
+
+    if(list.length===0){
+      wrap.innerHTML = '<div class="empty-hint">No courses match that filter.</div>';
+    }
+
+    list.forEach(c=>{
+      const elig = eligibility(c);
+      const row = document.createElement('div');
+      row.className = 'select-row' + (elig.status==='locked' ? ' locked' : '') + (elig.status==='done' ? ' done' : '');
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.disabled = elig.status !== 'ok';
+      cb.checked = state.desired.includes(c.id);
+      cb.addEventListener('change', ()=>{
+        if(cb.checked) state.desired.push(c.id);
+        else state.desired = state.desired.filter(d=>d!==c.id);
+        save();
+        document.getElementById('selected-count').textContent = state.desired.length + ' selected';
+      });
+      const info = document.createElement('div');
+      info.className = 'info';
+      let statusHtml = '';
+      if(elig.status==='ok'){
+        const openSections = c.sections.filter(s=>!isClosed(s)).length;
+        statusHtml = `<div class="status ok">eligible · ${openSections}/${c.sections.length} section${c.sections.length!==1?'s':''} open</div>`;
+      } else if(elig.status==='locked') statusHtml = `<div class="status locked">needs: ${elig.missing.join(', ')}</div>`;
+      else statusHtml = '<div class="status done">already completed</div>';
+      info.innerHTML = `<span class="code">${c.code}</span><span class="name">${c.name||''}</span>${statusHtml}`;
+      row.appendChild(cb); row.appendChild(info);
+      wrap.appendChild(row);
+    });
+    document.getElementById('selected-count').textContent = state.desired.length + ' selected';
+  }
+  document.getElementById('select-filter').addEventListener('input', renderSelectList);
+
+  // ---------- scheduler ----------
+  function blocksForSection(course, sec){
+    return sec.blocks.flatMap(b => b.days.map(day => ({
+      day, startMin: timeToMin(b.start), endMin: timeToMin(b.end),
+      room: b.room, courseId: course.id, sectionId: sec.id
+    })));
+  }
+
+  function computeGap(placedBlocks){
+    const byDay = {};
+    placedBlocks.forEach(b=>{ (byDay[b.day] = byDay[b.day]||[]).push(b); });
+    let total = 0;
+    Object.keys(byDay).forEach(day=>{
+      const arr = byDay[day].slice().sort((a,b)=>a.startMin-b.startMin);
+      for(let i=1;i<arr.length;i++){
+        const gap = arr[i].startMin - arr[i-1].endMin;
+        if(gap>0) total += gap;
+      }
+    });
+    return total;
+  }
+
+  function scheduleCourses(courses, excludeFull){
+    // build effective section lists (filtered by capacity if requested)
+    const effective = courses.map(c=>{
+      let secs = c.sections;
+      if(excludeFull) secs = secs.filter(s=>!isClosed(s));
+      return { course: c, sections: secs };
+    });
+    const ordered = effective.slice().sort((a,b)=>a.sections.length-b.sections.length);
+    const n = ordered.length;
+    let bestSkipCount = Infinity;
+    let best = null;
+    let nodeCount = 0;
+    const MAX_NODES = 400000;
+
+    function dfs(i, placedBlocks, skipCount, choiceMap, skippedIds){
+      nodeCount++;
+      if(nodeCount > MAX_NODES) return;
+      if(skipCount > bestSkipCount) return;
+      if(i === n){
+        const gap = computeGap(placedBlocks);
+        if(skipCount < bestSkipCount || (skipCount===bestSkipCount && (!best || gap < best.gap))){
+          bestSkipCount = skipCount;
+          best = { gap, choice: new Map(choiceMap), skipped: skippedIds.slice() };
+        }
+        return;
+      }
+      const entry = ordered[i];
+      const course = entry.course;
+      if(entry.sections.length === 0){
+        skippedIds.push(course.id);
+        dfs(i+1, placedBlocks, skipCount+1, choiceMap, skippedIds);
+        skippedIds.pop();
+        return;
+      }
+      for(const sec of entry.sections){
+        const blocks = blocksForSection(course, sec);
+        let conflict = false;
+        for(const pb of placedBlocks){
+          for(const nb of blocks){
+            if(pb.day===nb.day && pb.startMin<nb.endMin && nb.startMin<pb.endMin){ conflict=true; break; }
+          }
+          if(conflict) break;
+        }
+        if(!conflict){
+          choiceMap.set(course.id, sec.id);
+          dfs(i+1, placedBlocks.concat(blocks), skipCount, choiceMap, skippedIds);
+          choiceMap.delete(course.id);
+        }
+      }
+      skippedIds.push(course.id);
+      dfs(i+1, placedBlocks, skipCount+1, choiceMap, skippedIds);
+      skippedIds.pop();
+    }
+
+    dfs(0, [], 0, new Map(), []);
+    return best;
+  }
+
+  // ---------- generate / render results ----------
+  document.getElementById('generate-btn').addEventListener('click', ()=>{
+    const selected = state.courses.filter(c=>state.desired.includes(c.id) && eligibility(c).status==='ok');
+    const excludeFull = document.getElementById('exclude-full-toggle').checked;
+    const resultsEl = document.getElementById('results');
+    if(selected.length===0){
+      resultsEl.style.display = 'block';
+      document.getElementById('conflict-area').innerHTML = '<div class="conflict-box"><strong>Nothing to schedule</strong>Select at least one eligible course above.</div>';
+      document.getElementById('summary-strip').innerHTML = '';
+      document.getElementById('calendar').innerHTML = '';
+      document.getElementById('day-header-row').innerHTML = '';
+      return;
+    }
+    const best = scheduleCourses(selected, excludeFull);
+    resultsEl.style.display = 'block';
+    renderResults(selected, best);
+    window.scrollTo({top: document.body.scrollHeight, behavior:'smooth'});
+  });
+
+  const COLORS = ['#3C6E47','#2E5C8A','#8A4B6B','#B5772E','#4A6B8A','#6E4B8A','#3C7A6E','#8A5B3C','#5B6470','#2E7A5C'];
+
+  function renderResults(selected, best){
+    const conflictArea = document.getElementById('conflict-area');
+    const summaryStrip = document.getElementById('summary-strip');
+    const calendar = document.getElementById('calendar');
+    const headerRow = document.getElementById('day-header-row');
+    conflictArea.innerHTML = '';
+    calendar.innerHTML = '';
+    headerRow.innerHTML = '';
+
+    if(!best){
+      conflictArea.innerHTML = '<div class="conflict-box"><strong>Could not build a schedule</strong>Search limit reached before finding a valid combination — try selecting fewer courses at once.</div>';
+      summaryStrip.innerHTML = '';
+      return;
+    }
+
+    const skippedCourses = best.skipped.map(id=>selected.find(c=>c.id===id));
+    if(skippedCourses.length>0){
+      conflictArea.innerHTML = `<div class="conflict-box"><strong>${skippedCourses.length} course${skippedCourses.length>1?'s':''} couldn't fit</strong>` +
+        `Every open section of ${skippedCourses.map(c=>c.code).join(', ')} clashes with the rest of your selection (or has no open seats). Deselect something else to make room, uncheck "only open sections", or accept this schedule without ${skippedCourses.length>1?'them':'it'}.</div>`;
+    }
+
+    const colorMap = {};
+    selected.forEach((c,i)=>{ colorMap[c.id] = COLORS[i % COLORS.length]; });
+
+    const placedBlocks = [];
+    best.choice.forEach((secId, courseId)=>{
+      const course = selected.find(c=>c.id===courseId);
+      const sec = course.sections.find(s=>s.id===secId);
+      blocksForSection(course, sec).forEach(b=> placedBlocks.push({...b, course, sec}));
+    });
+
+    const includedCount = selected.length - skippedCourses.length;
+    summaryStrip.innerHTML = `
+      <div><b>${includedCount}</b>courses scheduled</div>
+      <div><b>${Math.floor(best.gap/60)}h ${best.gap%60}m</b>total gap time / week</div>
+      <div><b>${skippedCourses.length}</b>couldn't fit</div>
+    `;
+
+    if(placedBlocks.length===0){
+      calendar.innerHTML = '<div class="empty-hint" style="padding:20px;">No sections could be placed.</div>';
+      return;
+    }
+
+    const usedDays = new Set(placedBlocks.map(b=>b.day));
+    ['Sun','Mon','Tue','Wed','Thu'].forEach(d=>usedDays.add(d));
+    const dayList = DAYS.filter(d=>usedDays.has(d));
+
+    let minMin = Math.min(...placedBlocks.map(b=>b.startMin)) - 30;
+    let maxMin = Math.max(...placedBlocks.map(b=>b.endMin)) + 30;
+    minMin = Math.floor(minMin/60)*60;
+    maxMin = Math.ceil(maxMin/60)*60;
+    minMin = Math.max(minMin, 6*60);
+    maxMin = Math.min(maxMin, 23*60);
+    const span = maxMin - minMin;
+    const PX_PER_MIN = 1.15;
+    const totalHeight = span * PX_PER_MIN;
+
+    const spacer = document.createElement('div');
+    spacer.className = 'time-axis-spacer';
+    headerRow.appendChild(spacer);
+    dayList.forEach(d=>{
+      const h = document.createElement('div');
+      h.className = 'day-header';
+      h.textContent = d;
+      headerRow.appendChild(h);
+    });
+
+    const axis = document.createElement('div');
+    axis.className = 'time-axis';
+    axis.style.height = totalHeight + 'px';
+    for(let m=minMin; m<=maxMin; m+=60){
+      const lbl = document.createElement('div');
+      lbl.className = 'lbl';
+      lbl.style.top = ((m-minMin)*PX_PER_MIN) + 'px';
+      lbl.textContent = minToLabel(m);
+      axis.appendChild(lbl);
+    }
+    calendar.appendChild(axis);
+
+    dayList.forEach(day=>{
+      const col = document.createElement('div');
+      col.className = 'day-col';
+      col.style.height = totalHeight + 'px';
+      for(let m=minMin; m<=maxMin; m+=60){
+        const line = document.createElement('div');
+        line.className = 'hline';
+        line.style.top = ((m-minMin)*PX_PER_MIN) + 'px';
+        col.appendChild(line);
+      }
+      const dayBlocks = placedBlocks.filter(b=>b.day===day).sort((a,b)=>a.startMin-b.startMin);
+      dayBlocks.forEach(b=>{
+        const el = document.createElement('div');
+        el.className = 'block';
+        el.style.top = ((b.startMin-minMin)*PX_PER_MIN) + 'px';
+        el.style.height = Math.max((b.endMin-b.startMin)*PX_PER_MIN, 28) + 'px';
+        el.style.background = colorMap[b.course.id];
+        el.innerHTML = `<span class="bcode">${b.course.code}</span><span class="btime">${minToLabel(b.startMin)}–${minToLabel(b.endMin)}</span>${b.room?`<span class="broom">${b.room}</span>`:''}`;
+        col.appendChild(el);
+      });
+      for(let i=1;i<dayBlocks.length;i++){
+        const gap = dayBlocks[i].startMin - dayBlocks[i-1].endMin;
+        if(gap>0){
+          const badge = document.createElement('div');
+          const cls = gap<=15 ? 'tight' : gap>60 ? 'long' : 'mid';
+          badge.className = 'gap-badge ' + cls;
+          const midMin = (dayBlocks[i-1].endMin + dayBlocks[i].startMin)/2;
+          badge.style.top = ((midMin-minMin)*PX_PER_MIN) + 'px';
+          badge.textContent = gap + 'm';
+          col.appendChild(badge);
+        }
+      }
+      calendar.appendChild(col);
+    });
+  }
+
+  // ---------- data controls ----------
+  document.getElementById('sample-btn').addEventListener('click', ()=>{
+    if(state.courses.length>0 && !confirm('This adds sample courses to your existing catalog. Continue?')) return;
+    const sample = [
+      { code:'CS101', name:'Intro to Programming', prereqs:[], sections:[
+        { id:uid(), label:'Sec A', blocks:[{days:['Mon','Wed','Fri'], start:'09:00', end:'09:50'}], capacity:{enrolled:30,total:40} },
+        { id:uid(), label:'Sec B', blocks:[{days:['Tue','Thu'], start:'11:00', end:'12:15'}], capacity:{enrolled:40,total:40} } ]},
+      { code:'CS201', name:'Data Structures', prereqs:['CS101'], sections:[
+        { id:uid(), label:'Sec A', blocks:[{days:['Mon','Wed','Fri'], start:'10:00', end:'10:50'}], capacity:{enrolled:12,total:40} },
+        { id:uid(), label:'Sec B', blocks:[{days:['Tue','Thu'], start:'09:30', end:'10:45'}], capacity:{enrolled:38,total:40} } ]},
+      { code:'CS210', name:'Discrete Mathematics', prereqs:[], sections:[
+        { id:uid(), label:'Sec A', blocks:[{days:['Mon','Wed'], start:'13:00', end:'14:15'}], capacity:{enrolled:20,total:40} } ]},
+      { code:'CS301', name:'Algorithms', prereqs:['CS201'], sections:[
+        { id:uid(), label:'Sec A', blocks:[{days:['Tue','Thu'], start:'13:00', end:'14:15'}], capacity:{enrolled:40,total:40} },
+        { id:uid(), label:'Sec B', blocks:[{days:['Mon','Wed','Fri'], start:'11:00', end:'11:50'}], capacity:{enrolled:10,total:40} } ]},
+      { code:'PHYS101', name:'Physics I', prereqs:[], sections:[
+        { id:uid(), label:'Sec A', blocks:[{days:['Mon','Wed','Fri'], start:'11:00', end:'11:50'}], capacity:{enrolled:5,total:40} },
+        { id:uid(), label:'Sec B', blocks:[{days:['Tue','Thu'], start:'14:00', end:'15:15'}], capacity:{enrolled:40,total:40} } ]},
+      { code:'ENG105', name:'Technical Writing', prereqs:[], sections:[
+        { id:uid(), label:'Sec A', blocks:[{days:['Tue','Thu'], start:'10:00', end:'11:15'}], capacity:{enrolled:15,total:30} } ]},
+    ];
+    sample.forEach(c=> state.courses.push({ id: uid(), ...c }));
+    if(state.completed.length===0) state.completed = ['CS101'];
+    save(); renderAll();
+  });
+
+  document.getElementById('export-btn').addEventListener('click', ()=>{
+    const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'course-planner-data.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('import-btn').addEventListener('click', ()=>{
+    document.getElementById('import-file').click();
+  });
+  document.getElementById('import-file').addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      try{
+        const parsed = JSON.parse(reader.result);
+        const merge = state.courses.length>0 ? confirm('Merge with your existing catalog? Cancel to replace it entirely.') : false;
+        const incoming = parsed.courses || [];
+        if(merge){
+          const existingCodes = new Set(state.courses.map(c=>c.code));
+          incoming.forEach(c=>{ if(!existingCodes.has(c.code)) state.courses.push(c); });
+        } else {
+          state.courses = incoming;
+          state.completed = parsed.completed || [];
+          state.desired = parsed.desired || [];
+        }
+        save(); renderAll();
+        alert('Data imported: ' + incoming.length + ' course(s) in the file.');
+      }catch(err){ alert('Could not read that file as valid JSON.'); }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  document.getElementById('clear-btn').addEventListener('click', ()=>{
+    if(!confirm('This clears your catalog, completed courses, and selections. This cannot be undone unless you exported first. Continue?')) return;
+    state = { courses:[], completed:[], desired:[] };
+    save(); renderAll();
+    document.getElementById('results').style.display = 'none';
+  });
+
+  document.getElementById('exclude-full-toggle').addEventListener('change', renderSelectList);
+
+  // ---------- render all ----------
+  function renderAll(){
+    renderCompletedTags();
+    renderCatalogList();
+    renderSelectList();
+  }
+
+  load();
+  renderDayToggles();
+  renderAll();
+})();
+</script>
+</body>
+</html>
